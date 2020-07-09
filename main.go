@@ -57,3 +57,7 @@ func main() {
 func hello(req *restful.Request, resp *restful.Response) {
 	io.WriteString(resp, "hello")
 }
+
+func register(req *restful.Request, resp *restful.Response) {
+	io.WriteString(resp, "Success")
+}

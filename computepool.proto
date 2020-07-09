@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+message RegisterRequest {
+  string host = 1;
+  int32 port = 2;
+}
+
+message RegisterResponse { string succ = 1; }
+
+message PowRequest { string msg = 1; }
+
+message PowResponse {
+  string msg = 1;
+  int64 number = 2;
+}
