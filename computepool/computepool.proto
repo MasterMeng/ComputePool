@@ -9,9 +9,12 @@ message RegisterRequest {
 
 message RegisterResponse { string info = 1; }
 
-message PowRequest { string msg = 1; }
+message PoWRequest {
+  string msg = 1;
+  int32 hard = 2;
+}
 
-message PowResponse {
+message PoWResponse {
   string msg = 1;
   int64 number = 2;
 }

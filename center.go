@@ -12,6 +12,5 @@ func main() {
 	server.RegisterRoutes("/hello", "get", server.Hello)
 	server.RegisterRoutes("/register", "post", server.Register)
 	server.RegisterRoutes("/dowork", "get", server.DoWork)
-	server.SetHard(0)
 	server.Start()
 }

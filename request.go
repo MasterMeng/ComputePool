@@ -13,8 +13,9 @@ import (
 func main() {
 	url := "http://localhost:8888/dowork"
 
-	registerReq := &computepool.PowRequest{
-		Msg: "localhost",
+	registerReq := &computepool.PoWRequest{
+		Msg:  "localhost",
+		Hard: 0,
 	}
 
 	reqBody, _ := proto.Marshal(registerReq)
@@ -28,7 +29,7 @@ func main() {
 	fmt.Println(resp.StatusCode)
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
-	pow := &computepool.PowResponse{}
+	pow := &computepool.PoWResponse{}
 	proto.Unmarshal(respBody, pow)
 
 	fmt.Println(pow)

@@ -98,10 +98,10 @@ func (s *Server) Register(req *restful.Request, resp *restful.Response) {
 // PoW proof of work
 func (s *Server) PoW(req *restful.Request, resp *restful.Response) {
 	body, _ := ioutil.ReadAll(req.Request.Body)
-	powReq := &PowRequest{}
+	powReq := &PoWRequest{}
 
 	proto.Unmarshal(body, powReq)
-	fmt.Println(powReq)
+	s.SetHard(int(powReq.Hard))
 
 	var i int64
 	for i = 0; ; i++ {
@@ -112,7 +112,7 @@ func (s *Server) PoW(req *restful.Request, resp *restful.Response) {
 		}
 	}
 
-	powResp := &PowResponse{}
+	powResp := &PoWResponse{}
 	powResp.Msg = powReq.Msg
 	powResp.Number = i
 
