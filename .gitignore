@@ -1,2 +1,2 @@
 .vscode
-go.sum
+*.pb.go
