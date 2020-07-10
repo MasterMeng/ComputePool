@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -104,17 +105,25 @@ func (s *Server) PoW(req *restful.Request, resp *restful.Response) {
 	s.SetHard(int(powReq.Hard))
 
 	var i int64
-	for i = 0; ; i++ {
-		hashed := s.calculateHash(powReq.Msg, i)
-		fmt.Printf("%s hashed: %s\n", powReq.Msg, hashed)
-		if s.isHashValie(hashed) {
-			break
-		}
+	ch := make(chan int64)
+	cpus := runtime.NumCPU()
+	runtime.GOMAXPROCS(cpus)
+	for j := 0; j < cpus; j++ {
+		go func() {
+			for i = 0; ; i++ {
+				hashed := s.calculateHash(powReq.Msg, i)
+				fmt.Printf("%s hashed: %s\n", powReq.Msg, hashed)
+				if s.isHashValie(hashed) {
+					ch <- i
+					break
+				}
+			}
+		}()
 	}
 
 	powResp := &PoWResponse{}
 	powResp.Msg = powReq.Msg
-	powResp.Number = i
+	powResp.Number = <-ch
 
 	respBody, _ := proto.Marshal(powResp)
 	resp.Write(respBody)
