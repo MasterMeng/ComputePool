@@ -17,6 +17,7 @@ message PoWRequest {
 message PoWResponse {
   string msg = 1;
   int64 number = 2;
+  string time = 3;
 }
 
 message HostPort {

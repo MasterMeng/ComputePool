@@ -105,25 +105,22 @@ func (s *Server) PoW(req *restful.Request, resp *restful.Response) {
 	s.SetHard(int(powReq.Hard))
 
 	var i int64
-	ch := make(chan int64)
+	ch := make(chan *PoWResponse)
 	cpus := runtime.NumCPU()
 	runtime.GOMAXPROCS(cpus)
 	for j := 0; j < cpus; j++ {
 		go func() {
 			for i = 0; ; i++ {
-				hashed := s.calculateHash(powReq.Msg, i)
+				resp ,hashed := s.calculateHash(powReq.Msg, i)
 				fmt.Printf("%s hashed: %s\n", powReq.Msg, hashed)
 				if s.isHashValie(hashed) {
-					ch <- i
+					ch <- resp
 					break
 				}
 			}
 		}()
 	}
-
-	powResp := &PoWResponse{}
-	powResp.Msg = powReq.Msg
-	powResp.Number = <-ch
+	powResp := <-ch
 
 	respBody, _ := proto.Marshal(powResp)
 	resp.Write(respBody)
@@ -145,19 +142,24 @@ func (s *Server) alive(hp *HostPort) bool {
 }
 
 // calculateHash calculate the hash
-func (s *Server) calculateHash(msg string, i int64) string {
-	record := msg + strconv.Itoa(int(i)) + time.Now().String()
+func (s *Server) calculateHash(msg string, i int64) (*PoWResponse,string ){
+	now := time.Now().String()
+	record := msg + strconv.Itoa(int(i)) + now
 	h := sha256.New()
 	h.Write([]byte(record))
 	hashed := h.Sum(nil)
-	return hex.EncodeToString(hashed)
+	return &PoWResponse{
+		Msg: msg,
+		Number: i,
+		Time: now,
+	} ,hex.EncodeToString(hashed)
 }
 
 // isHashValie judge the hash string
 func (s *Server) isHashValie(hash string) bool {
 	i := len(hash)
 	var j int
-	for j = 0; j < i; j++ {
+	for j = 0; j <=i; j++ {
 		if hash[j] != '0' {
 			break
 		}

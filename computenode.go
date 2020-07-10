@@ -30,6 +30,6 @@ func main() {
 	server := computepool.NewServer(9999)
 	server.RegisterRoutes("/hello", "get", server.Hello)
 	server.RegisterRoutes("/pow", "get", server.PoW)
-	server.SetHard(0)
+	server.SetHard(2)
 	server.Start()
 }
