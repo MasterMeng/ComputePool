@@ -7,13 +7,13 @@ import (
 	"net/http"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/mastermeng/computepool/computepool"
+	"github.com/mastermeng/calculatepool/calculatepool"
 )
 
 func main() {
 	url := "http://localhost:8888/dowork"
 
-	registerReq := &computepool.PoWRequest{
+	registerReq := &calculatepool.PoWRequest{
 		Msg:  "localhost",
 		Hard: 0,
 	}
@@ -29,7 +29,7 @@ func main() {
 	fmt.Println(resp.StatusCode)
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
-	pow := &computepool.PoWResponse{}
+	pow := &calculatepool.PoWResponse{}
 	proto.Unmarshal(respBody, pow)
 
 	fmt.Println(pow)

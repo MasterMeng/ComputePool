@@ -1,4 +1,4 @@
-package computepool
+package calculatepool
 
 import (
 	"crypto/sha256"
@@ -20,14 +20,14 @@ import (
 type Server struct {
 	port   int
 	ws     *restful.WebService
-	hp     []*HostPort
+	hp     []*RegisterRequest
 	client *http.Client
 	hard   int
 }
 
 // NewServer return an instance of the server
 func NewServer(port int) *Server {
-	var hp []*HostPort
+	var hp []*RegisterRequest
 	return &Server{
 		port:   port,
 		ws:     new(restful.WebService),
@@ -81,7 +81,7 @@ func (s *Server) Register(req *restful.Request, resp *restful.Response) {
 
 	fmt.Println(registerReq)
 
-	hp := &HostPort{
+	hp := &RegisterRequest{
 		Host: registerReq.Host,
 		Port: registerReq.Port,
 	}
@@ -111,7 +111,7 @@ func (s *Server) PoW(req *restful.Request, resp *restful.Response) {
 	for j := 0; j < cpus; j++ {
 		go func() {
 			for i = 0; ; i++ {
-				resp ,hashed := s.calculateHash(powReq.Msg, i)
+				resp, hashed := s.calculateHash(powReq.Msg, i)
 				fmt.Printf("%s hashed: %s\n", powReq.Msg, hashed)
 				if s.isHashValie(hashed) {
 					ch <- resp
@@ -127,7 +127,7 @@ func (s *Server) PoW(req *restful.Request, resp *restful.Response) {
 }
 
 // alive get the compute node status
-func (s *Server) alive(hp *HostPort) bool {
+func (s *Server) alive(hp *RegisterRequest) bool {
 	url := "http://" + hp.Host + ":" + strconv.Itoa(int(hp.Port)) + "/hello"
 
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
@@ -142,24 +142,24 @@ func (s *Server) alive(hp *HostPort) bool {
 }
 
 // calculateHash calculate the hash
-func (s *Server) calculateHash(msg string, i int64) (*PoWResponse,string ){
+func (s *Server) calculateHash(msg string, i int64) (*PoWResponse, string) {
 	now := time.Now().String()
 	record := msg + strconv.Itoa(int(i)) + now
 	h := sha256.New()
 	h.Write([]byte(record))
 	hashed := h.Sum(nil)
 	return &PoWResponse{
-		Msg: msg,
+		Msg:    msg,
 		Number: i,
-		Time: now,
-	} ,hex.EncodeToString(hashed)
+		Time:   now,
+	}, hex.EncodeToString(hashed)
 }
 
 // isHashValie judge the hash string
 func (s *Server) isHashValie(hash string) bool {
 	i := len(hash)
 	var j int
-	for j = 0; j <=i; j++ {
+	for j = 0; j <= i; j++ {
 		if hash[j] != '0' {
 			break
 		}
@@ -171,7 +171,7 @@ func (s *Server) isHashValie(hash string) bool {
 func (s *Server) DoWork(req *restful.Request, resp *restful.Response) {
 	ch := make(chan *http.Response)
 	for _, hp := range s.hp {
-		go func(hp *HostPort) {
+		go func(hp *RegisterRequest) {
 			if s.alive(hp) {
 				url := "http://" + hp.Host + ":" + strconv.Itoa(int(hp.Port)) + "/pow"
 				powReq, _ := http.NewRequest(http.MethodGet, url, req.Request.Body)

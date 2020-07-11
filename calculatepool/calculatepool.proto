@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package computepool;
+package calculatepool;
 
 message RegisterRequest {
   string host = 1;
