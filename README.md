@@ -32,3 +32,6 @@ server.go中提供了如下的方法：
 ## computenode  
 
 向控制中心注册本节点信息，并提供PoW计算服务。
+
+
+本作品采用[署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)进行许可，使用时请注明出处。
